@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Chuyển Tiếp Link</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { display: flex; }
+        .column { 
+            flex: 1; 
+            margin: 10px; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+        }
+        .row { 
+            display: flex; 
+            margin-bottom: 10px; 
+            align-items: center; 
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border-radius: 50%;
+        }
+        .status-on { background-color: green; }
+        .status-off { background-color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="column column-a">
+            <h2>Cột A: Link Nguồn</h2>
+            <!-- 5 dòng nhập link nguồn -->
+            <div class="row">
+                <input type="text" class="source-link" placeholder="Nhập link nguồn">
+                <button class="save-link">Lưu link</button>
+                <button class="toggle-status">On/Off</button>
+                <div class="status-indicator status-on"></div>
+            </div>
+            <!-- Lặp lại 4 lần nữa -->
+        </div>
+        
+        <div class="column column-b">
+            <h2>Cột B: Link Đích</h2>
+            <!-- 5 dòng nhập link đích -->
+            <div class="row">
+                <input type="text" class="destination-link" placeholder="Nhập link đích">
+                <div class="status-indicator status-on"></div>
+            </div>
+            <!-- Lặp lại 4 lần nữa -->
+        </div>
+    </div>
 
+    <script>
+    $(document).ready(function() {
+        $('.save-link').on('click', function() {
+            const row = $(this).closest('.row');
+            const sourceLink = row.find('.source-link').val();
+            const destinationLink = $('.column-b .row').eq(row.index()).find('.destination-link').val();
+            
+            // Gửi link tới server để lưu
+            $.ajax({
+                url: '/save-link',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    sourceLink: sourceLink,
+                    destinationLink: destinationLink
+                }),
+                success: function(response) {
+                    alert('Lưu link thành công!');
+                },
+                error: function() {
+                    alert('Lỗi khi lưu link');
+                }
+            });
+        });
+
+        $('.toggle-status').on('click', function() {
+            const row = $(this).closest('.row');
+            const statusIndicator = row.find('.status-indicator');
+            
+            if (statusIndicator.hasClass('status-on')) {
+                statusIndicator.removeClass('status-on').addClass('status-off');
+            } else {
+                statusIndicator.removeClass('status-off').addClass('status-on');
+            }
+
+            // Gửi trạng thái tới server
+            $.ajax({
+                url: '/toggle-status',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    rowIndex: row.index(),
+                    status: statusIndicator.hasClass('status-on') ? 'on' : 'off'
+                })
+            });
+        });
+    });
+    </script>
+</body>
+</html>
