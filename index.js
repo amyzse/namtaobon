@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname)));
 
 // Lưu trữ trạng thái và liên kết
 const linkData = {
@@ -101,7 +101,7 @@ app.get('*', (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server đang chạy tại port ${PORT}`);
 });
